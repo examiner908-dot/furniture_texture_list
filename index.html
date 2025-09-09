@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Каталог текстур — Лента PDF</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      height: 100%;
+      overflow-y: scroll;
+      font-family: sans-serif;
+    }
+    #viewer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px;
+    }
+    canvas {
+      margin: 10px 0;
+      max-width: 100%;
+      height: auto;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+  </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.min.js"></script>
+</head>
+<body>
+  <div id="viewer"></div>
+
+  <script>
+    const url = 'furniture_texture_list_thetceh.pdf';
+
+    // Настройка PDF.js
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.2.67/pdf.worker.min.js';
+
+    const container = document.getElementById('viewer');
+
+    pdfjsLib.getDocument(url).promise.then(function(pdf) {
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        pdf.getPage(pageNum).then(function(page) {
+          const viewport = page.getViewport({ scale: 1.5 }); // масштаб по умолчанию
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d');
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+          container.appendChild(canvas);
+
+          const renderContext = {
+            canvasContext: context,
+            viewport: viewport
+          };
+          page.render(renderContext);
+        });
+      }
+    });
+  </script>
+</body>
+</html>
